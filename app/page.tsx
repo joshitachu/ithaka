@@ -1,65 +1,130 @@
-import Image from "next/image";
+"use client"
 
-export default function Home() {
+import Link from "next/link"
+import { Upload, Search, Building2, Database, TrendingUp, Sparkles } from "lucide-react"
+
+export default function HomePage() {
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
+    <main className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100">
+      <div className="max-w-7xl mx-auto p-8 space-y-8">
+        <header className="text-center space-y-4 py-12">
+          <div className="flex items-center justify-center gap-3">
+            <div className="w-16 h-16 bg-blue-600 rounded-2xl flex items-center justify-center shadow-lg">
+              <Database className="w-8 h-8 text-white" />
+            </div>
+          </div>
+          <h1 className="text-5xl font-bold text-slate-900">Welkom bij TenderNed</h1>
+          <p className="text-xl text-slate-600 max-w-2xl mx-auto">
+            Uw uitgebreide platform voor het importeren, analyseren en beheren van aanbestedingsgegevens met
+            geavanceerde SROI-compliance monitoring en CRM-mogelijkheden.
           </p>
+        </header>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto">
+          <Link href="/imports">
+            <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-8 hover:shadow-lg transition-all cursor-pointer group">
+              <div className="w-14 h-14 bg-blue-100 rounded-xl flex items-center justify-center mb-4 group-hover:bg-blue-200 transition-colors">
+                <Upload className="w-7 h-7 text-blue-600" />
+              </div>
+              <h2 className="text-2xl font-bold text-slate-900 mb-2">Imports</h2>
+              <p className="text-slate-600">
+                Importeer aanbestedingsgegevens van TenderNed met geavanceerde filteropties inclusief datumbereiken,
+                CPV-codes en regionale filters.
+              </p>
+            </div>
+          </Link>
+
+          <Link href="/search">
+            <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-8 hover:shadow-lg transition-all cursor-pointer group">
+              <div className="w-14 h-14 bg-purple-100 rounded-xl flex items-center justify-center mb-4 group-hover:bg-purple-200 transition-colors">
+                <Search className="w-7 h-7 text-purple-600" />
+              </div>
+              <h2 className="text-2xl font-bold text-slate-900 mb-2">Zoeken</h2>
+              <p className="text-slate-600">
+                Zoek naar bedrijven en hun aanbestedingsgeschiedenis over meerdere jaren. Analyseer patronen en sla
+                leads direct op in uw CRM.
+              </p>
+            </div>
+          </Link>
+
+          <Link href="/crm">
+            <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-8 hover:shadow-lg transition-all cursor-pointer group">
+              <div className="w-14 h-14 bg-emerald-100 rounded-xl flex items-center justify-center mb-4 group-hover:bg-emerald-200 transition-colors">
+                <Building2 className="w-7 h-7 text-emerald-600" />
+              </div>
+              <h2 className="text-2xl font-bold text-slate-900 mb-2">CRM</h2>
+              <p className="text-slate-600">
+                Beheer uw leads en bedrijven met een volledig uitgeruste CRM. Volg contacten, update statussen en plan
+                vervolgacties.
+              </p>
+            </div>
+          </Link>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
-    </div>
-  );
+
+        <section className="bg-white rounded-2xl shadow-sm border border-slate-200 p-8 max-w-5xl mx-auto">
+          <div className="flex items-center gap-3 mb-6">
+            <div className="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center">
+              <Sparkles className="w-6 h-6 text-green-600" />
+            </div>
+            <div>
+              <h2 className="text-2xl font-bold text-slate-900">Belangrijkste Functies</h2>
+              <p className="text-slate-600">Alles wat u nodig heeft om aanbestedingsgegevens te beheren</p>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="flex gap-4">
+              <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                <TrendingUp className="w-5 h-5 text-blue-600" />
+              </div>
+              <div>
+                <h3 className="font-semibold text-slate-900 mb-1">SROI Compliance Analyse</h3>
+                <p className="text-sm text-slate-600">
+                  Analyseer automatisch aanbestedingen op Social Return on Investment compliance met gedetailleerde
+                  rapportage.
+                </p>
+              </div>
+            </div>
+
+            <div className="flex gap-4">
+              <div className="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                <Database className="w-5 h-5 text-purple-600" />
+              </div>
+              <div>
+                <h3 className="font-semibold text-slate-900 mb-1">Geavanceerde Filters</h3>
+                <p className="text-sm text-slate-600">
+                  Filter imports op datumbereik, CPV-codes en regionale locatie voor nauwkeurige gegevensverzameling.
+                </p>
+              </div>
+            </div>
+
+            <div className="flex gap-4">
+              <div className="w-10 h-10 bg-emerald-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                <Building2 className="w-5 h-5 text-emerald-600" />
+              </div>
+              <div>
+                <h3 className="font-semibold text-slate-900 mb-1">Geïntegreerde CRM</h3>
+                <p className="text-sm text-slate-600">
+                  Sla bedrijven uit zoekresultaten direct op in uw CRM en beheer de volledige verkooppijplijn.
+                </p>
+              </div>
+            </div>
+
+            <div className="flex gap-4">
+              <div className="w-10 h-10 bg-orange-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                <Search className="w-5 h-5 text-orange-600" />
+              </div>
+              <div>
+                <h3 className="font-semibold text-slate-900 mb-1">Bedrijven Zoeken</h3>
+                <p className="text-sm text-slate-600">
+                  Zoek historische aanbestedingsgegevens op bedrijfsnaam en analyseer hun inschrijvingspatronen in de
+                  loop van de tijd.
+                </p>
+              </div>
+            </div>
+          </div>
+        </section>
+      </div>
+    </main>
+  )
 }
