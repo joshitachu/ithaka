@@ -2,7 +2,6 @@
 
 import { useState } from "react"
 import { Search, Building2, Calendar, TrendingUp } from "lucide-react"
-import { useToast } from "@/hooks/use-toast"
 
 type CompanySearchResult = {
   publicatiedatum: string
@@ -18,7 +17,6 @@ type CompanySearchResult = {
 }
 
 export default function SearchPage() {
-  const { toast } = useToast()
   const [companyQuery, setCompanyQuery] = useState("")
   const [companyYears, setCompanyYears] = useState<number>(5)
   const [companyResults, setCompanyResults] = useState<CompanySearchResult[]>([])
@@ -27,11 +25,7 @@ export default function SearchPage() {
 
   const handleCompanySearch = async () => {
     if (!companyQuery || companyQuery.trim().length === 0) {
-      toast({
-        title: "Geen bedrijfsnaam ingevuld",
-        description: "Vul een bedrijfsnaam in om te zoeken.",
-        variant: "destructive",
-      })
+      alert("Vul een bedrijfsnaam in om te zoeken.")
       return
     }
 
@@ -42,7 +36,7 @@ export default function SearchPage() {
     try {
       // Eerst Next.js API endpoint
       let res = await fetch(
-        `/api/search/company?q=${encodeURIComponent(companyQuery)}&years=${companyYears}`,
+        `/api/search/company?q=${encodeURIComponent(companyQuery)}&years=${companyYears}`
       )
       let data = await res.json().catch(() => ({}))
 
@@ -50,30 +44,24 @@ export default function SearchPage() {
       if (!res.ok || (data as any).error) {
         try {
           const fallbackUrl = `http://localhost:8001/api/search/company?q=${encodeURIComponent(
-            companyQuery,
+            companyQuery
           )}&years=${companyYears}`
           res = await fetch(fallbackUrl)
           data = await res.json()
         } catch (err2) {
           console.error("Fallback search failed", err2)
-          toast({
-            title: "Zoekopdracht mislukt",
-            description:
-              "Beide zoekendpoints falen. Start de backend of controleer de netwerkverbinding.",
-            variant: "destructive",
-          })
+          alert("Beide zoekendpoints falen. Start de backend of controleer de netwerkverbinding.")
           setCompanyResults([])
           return
         }
       }
 
       if (!res.ok) {
-        toast({
-          title: "Zoekopdracht mislukt",
-          description:
-            (data as any).error || (data as any).detail || "Er is een fout opgetreden bij het zoeken.",
-          variant: "destructive",
-        })
+        alert(
+          (data as any).error ||
+            (data as any).detail ||
+            "Er is een fout opgetreden bij het zoeken."
+        )
         setCompanyResults([])
       } else {
         const results: CompanySearchResult[] = (data as any).results || []
@@ -83,11 +71,9 @@ export default function SearchPage() {
         setCompanySearchTotal(total)
 
         if (total === 0) {
-          toast({
-            title: "Geen bedrijven gevonden",
-            description: `Er zijn geen bedrijven gevonden voor "${companyQuery}" in de afgelopen ${companyYears} jaar.`,
-            variant: "destructive",
-          })
+          alert(
+            `Er zijn geen bedrijven gevonden voor "${companyQuery}" in de afgelopen ${companyYears} jaar.`
+          )
         }
 
         console.log("[company-search] succes:", {
@@ -99,11 +85,7 @@ export default function SearchPage() {
       }
     } catch (err: any) {
       console.error("Fout bij bedrijf zoeken", err)
-      toast({
-        title: "Zoekopdracht mislukt",
-        description: "Fout bij zoeken. Bekijk de console voor details.",
-        variant: "destructive",
-      })
+      alert("Fout bij zoeken. Bekijk de console voor details.")
     } finally {
       setLoadingCompanySearch(false)
     }
@@ -195,9 +177,7 @@ export default function SearchPage() {
                 </div>
                 <div>
                   <h2 className="text-lg font-semibold text-slate-900">Zoekresultaten</h2>
-                  <p className="text-sm text-slate-600">
-                    {companySearchTotal} bedrijven gevonden
-                  </p>
+                  <p className="text-sm text-slate-600">{companySearchTotal} bedrijven gevonden</p>
                 </div>
               </div>
             </div>
@@ -238,7 +218,7 @@ export default function SearchPage() {
                             </div>
                             {company.begindatum_opdracht && (
                               <span>
-                                Contract: {company.begindatum_opdracht} -{" "}
+                                Contract: {company.begindatum_opdracht} –{" "}
                                 {company.einddatum_opdracht || "Lopend"}
                               </span>
                             )}
@@ -250,8 +230,6 @@ export default function SearchPage() {
                           </div>
                         </div>
                       </div>
-
-                      {/* CRM functionaliteit is verwijderd */}
                     </div>
                   </div>
                 )
