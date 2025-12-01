@@ -8,13 +8,12 @@ import {
   FileText,
   Building2,
   User2,
-  Phone,
-  Mail,
-  Globe2,
   MapPin,
   Euro,
   History,
   Link2,
+  CheckCircle2,
+  AlertCircle,
 } from "lucide-react"
 
 type NoticeDetail = {
@@ -59,6 +58,18 @@ type NoticeDetail = {
   updated_at?: string
 }
 
+// matches crm_create_company docstring
+type CrmCompanyPayload = {
+  name: string
+  website?: string | null
+  kvk?: string | null
+  contact_name?: string | null
+  contact_email?: string | null
+  source_notice_id?: string | null
+  notes?: string | null
+  lead_status?: string | null
+}
+
 export default function NoticeDetailPage() {
   const params = useParams()
   const router = useRouter()
@@ -66,13 +77,17 @@ export default function NoticeDetailPage() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
+  // CRM state – alleen nog voor winnaar
+  const [crmLoading, setCrmLoading] = useState<boolean>(false)
+  const [crmSuccess, setCrmSuccess] = useState<string | null>(null)
+  const [crmError, setCrmError] = useState<string | null>(null)
+
   useEffect(() => {
     const fetchNotice = async () => {
       try {
         const importId = params.importId as string
         const noticeId = params.noticeId as string
 
-        // Zorg dat je in je API een route hebt: GET /api/imports/[importId]/notices/[noticeId]
         const res = await fetch(
           `/api/imports/${importId}/notices/${noticeId}`
         )
@@ -106,6 +121,59 @@ export default function NoticeDetailPage() {
         </span>
       </div>
     )
+  }
+
+  // --- CRM helpers: alleen WINNAAR toestaan ---
+
+  const createCrmCompany = async () => {
+    if (!notice) return
+
+    setCrmError(null)
+    setCrmSuccess(null)
+    setCrmLoading(true)
+
+    try {
+      if (!notice.win_bedrijf_naam) {
+        throw new Error("Geen bedrijfsnaam voor winnaar beschikbaar")
+      }
+
+      const payload: CrmCompanyPayload = {
+        name: notice.win_bedrijf_naam,
+        website: notice.win_website,
+        kvk: notice.win_kvk,
+        contact_name: notice.win_contact_naam,
+        contact_email: notice.win_contact_email,
+        source_notice_id: notice.notice_id ?? notice.id,
+        notes: `Automatisch aangemaakt vanuit winnaar van notice: "${notice.titel ?? ""}"`,
+        lead_status: "new",
+      }
+
+      const res = await fetch("/api/crm/companies", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(payload),
+      })
+
+      if (!res.ok) {
+        const txt = await res.text()
+        throw new Error(
+          `CRM-fout (${res.status}): ${
+            txt || res.statusText || "onbekende fout"
+          }`
+        )
+      }
+
+      const created = await res.json()
+      setCrmSuccess(
+        `CRM-bedrijf aangemaakt (#${created.id ?? "?"}) voor winnaar`
+      )
+    } catch (e: any) {
+      setCrmError(e.message || "Kon CRM-bedrijf niet aanmaken")
+    } finally {
+      setCrmLoading(false)
+    }
   }
 
   if (loading) {
@@ -153,34 +221,52 @@ export default function NoticeDetailPage() {
           Terug naar import
         </button>
 
+        {/* CRM feedback */}
+        {(crmSuccess || crmError) && (
+          <div
+            className={`rounded-xl border p-3 text-sm flex items-start gap-2 ${
+              crmSuccess
+                ? "bg-emerald-50 border-emerald-200 text-emerald-800"
+                : "bg-red-50 border-red-200 text-red-800"
+            }`}
+          >
+            {crmSuccess ? (
+              <CheckCircle2 className="w-4 h-4 mt-0.5" />
+            ) : (
+              <AlertCircle className="w-4 h-4 mt-0.5" />
+            )}
+            <p>{crmSuccess || crmError}</p>
+          </div>
+        )}
+
         {/* Algemeen */}
         <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 space-y-4">
-  <div className="flex items-start gap-3">
-    <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center flex-shrink-0">
-      <FileText className="w-6 h-6 text-blue-600" />
-    </div>
-    <div className="flex-1 space-y-2">
-      <div className="flex flex-col gap-1">
-        <h1 className="text-xl font-bold text-slate-900">
-          {notice.titel || "Geen titel"}
-        </h1>
-        <p className="text-sm text-slate-500">
-          Notice ID: {notice.notice_id || "-"} • Publicatie ID:{" "}
-          {notice.publicatie_id || "-"}
-        </p>
-      </div>
+          <div className="flex items-start gap-3">
+            <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center flex-shrink-0">
+              <FileText className="w-6 h-6 text-blue-600" />
+            </div>
+            <div className="flex-1 space-y-2">
+              <div className="flex flex-col gap-1">
+                <h1 className="text-xl font-bold text-slate-900">
+                  {notice.titel || "Geen titel"}
+                </h1>
+                <p className="text-sm text-slate-500">
+                  Notice ID: {notice.notice_id || "-"} • Publicatie ID:{" "}
+                  {notice.publicatie_id || "-"}
+                </p>
+              </div>
 
-      {notice.publicatie_id && (
-        <a
-          href={`https://www.tenderned.nl/aankondigingen/overzicht/${notice.publicatie_id}`}
-          target="_blank"
-          rel="noreferrer"
-          className="inline-flex items-center gap-1 text-sm text-blue-600 hover:underline"
-        >
-          <Link2 className="w-4 h-4" />
-          Open in TenderNed
-        </a>
-      )}
+              {notice.publicatie_id && (
+                <a
+                  href={`https://www.tenderned.nl/aankondigingen/overzicht/${notice.publicatie_id}`}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="inline-flex items-center gap-1 text-sm text-blue-600 hover:underline"
+                >
+                  <Link2 className="w-4 h-4" />
+                  Open in TenderNed
+                </a>
+              )}
 
               {notice.omschrijving && (
                 <div className="mt-3">
@@ -220,16 +306,32 @@ export default function NoticeDetailPage() {
 
         {/* Winnaar */}
         <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 space-y-4">
-          <div className="flex items-center gap-2 mb-2">
-            <div className="w-9 h-9 bg-emerald-100 rounded-lg flex items-center justify-center">
-              <Building2 className="w-5 h-5 text-emerald-600" />
+          <div className="flex items-start justify-between gap-2 mb-2">
+            <div className="flex items-center gap-2">
+              <div className="w-9 h-9 bg-emerald-100 rounded-lg flex items-center justify-center">
+                <Building2 className="w-5 h-5 text-emerald-600" />
+              </div>
+              <div>
+                <h2 className="text-lg font-semibold text-slate-900">
+                  Winnaar
+                </h2>
+                <p className="text-xs text-slate-500">
+                  Bedrijfsgegevens van de winnende inschrijver
+                </p>
+              </div>
             </div>
-            <div>
-              <h2 className="text-lg font-semibold text-slate-900">Winnaar</h2>
-              <p className="text-xs text-slate-500">
-                Bedrijfsgegevens van de winnende inschrijver
-              </p>
-            </div>
+            <button
+              onClick={createCrmCompany}
+              disabled={!notice.win_bedrijf_naam || crmLoading}
+              className="inline-flex items-center gap-2 text-xs px-3 py-1.5 rounded-full border border-emerald-200 bg-emerald-50 text-emerald-700 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-emerald-100 transition-colors"
+            >
+              {crmLoading ? (
+                <span className="w-3 h-3 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin" />
+              ) : (
+                <CheckCircle2 className="w-3 h-3" />
+              )}
+              CRM: winnaar
+            </button>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -250,17 +352,21 @@ export default function NoticeDetailPage() {
           </div>
         </div>
 
-        {/* Inkoper */}
+        {/* Inkoper (zonder CRM-knop) */}
         <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 space-y-4">
-          <div className="flex items-center gap-2 mb-2">
-            <div className="w-9 h-9 bg-indigo-100 rounded-lg flex items-center justify-center">
-              <User2 className="w-5 h-5 text-indigo-600" />
-            </div>
-            <div>
-              <h2 className="text-lg font-semibold text-slate-900">Inkoper</h2>
-              <p className="text-xs text-slate-500">
-                Gegevens van de aanbestedende dienst
-              </p>
+          <div className="flex items-start gap-2 mb-2">
+            <div className="flex items-center gap-2">
+              <div className="w-9 h-9 bg-indigo-100 rounded-lg flex items-center justify-center">
+                <User2 className="w-5 h-5 text-indigo-600" />
+              </div>
+              <div>
+                <h2 className="text-lg font-semibold text-slate-900">
+                  Inkoper
+                </h2>
+                <p className="text-xs text-slate-500">
+                  Gegevens van de aanbestedende dienst
+                </p>
+              </div>
             </div>
           </div>
 
@@ -296,7 +402,7 @@ export default function NoticeDetailPage() {
             </div>
             <div>
               <h2 className="text-lg font-semibold text-slate-900">
-                Contract & meta
+                Contract &amp; meta
               </h2>
               <p className="text-xs text-slate-500">
                 Bedrag, valuta en technische metadata
