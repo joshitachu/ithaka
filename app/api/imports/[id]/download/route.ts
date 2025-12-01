@@ -11,10 +11,15 @@ export async function GET(
     const searchParams = request.nextUrl.searchParams;
     const format = searchParams.get("format") || "excel";
 
+    const userCode = request.headers.get("x-user-code") || request.cookies.get("user_code")?.value
+    const headers: Record<string, string> = {}
+    if (userCode) headers["X-User-Code"] = userCode
+
     const response = await fetch(
       `${BACKEND_URL}/imports/${id}/download?format=${format}`,
       {
         method: "GET",
+        headers,
       }
     );
 

@@ -3,13 +3,15 @@ import { NextRequest, NextResponse } from "next/server";
 
 const BACKEND_URL = process.env.BACKEND_URL|| "http://localhost:8000";
 
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
+    const userCode = request.headers.get("x-user-code") || request.cookies.get("user_code")?.value
+    const headers: Record<string, string> = { "Content-Type": "application/json" }
+    if (userCode) headers["X-User-Code"] = userCode
+
     const response = await fetch(`${BACKEND_URL}/imports`, {
       method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-      },
+      headers,
     });
 
     if (!response.ok) {
@@ -34,11 +36,13 @@ export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
 
+    const userCode = request.headers.get("x-user-code") || request.cookies.get("user_code")?.value
+    const headers: Record<string, string> = { "Content-Type": "application/json" }
+    if (userCode) headers["X-User-Code"] = userCode
+
     const response = await fetch(`${BACKEND_URL}/imports`, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
+      headers,
       body: JSON.stringify(body),
     });
 

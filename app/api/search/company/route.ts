@@ -3,9 +3,9 @@ import { NextResponse } from "next/server";
 const RAW_BACKEND_URL = process.env.BACKEND_URL || "http://localhost:8000";
 const BACKEND_URL = RAW_BACKEND_URL.replace(/\/+$/, ""); // remove trailing slash
 
-export async function GET(req: Request) {
+export async function GET(request: Request) {
   try {
-    const url = new URL(req.url);
+    const url = new URL(request.url);
     const q = (url.searchParams.get("q") || "").trim();
     const yearsParam = url.searchParams.get("years") || "5";
 
@@ -21,8 +21,13 @@ export async function GET(req: Request) {
       q
     )}&years=${yearsParam}`;
 
+    // propagate X-User-Code header or cookie if present
+    const userCode = request.headers.get("x-user-code") || (request.headers.get("cookie") || "").match(/user_code=([^;]+)/)?.[1]
+    const headers: Record<string, string> = { "Content-Type": "application/json" }
+    if (userCode) headers["X-User-Code"] = userCode
+
     const backendResponse = await fetch(backendUrl, {
-      headers: { "Content-Type": "application/json" },
+      headers,
     });
 
     const data = await backendResponse.json();

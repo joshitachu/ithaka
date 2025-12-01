@@ -21,14 +21,17 @@ export async function GET(
 
     console.log(`Fetching notice detail: importId=${id}, noticeId=${noticeId}`);
 
+    // Forward user code header or cookie
+    const userCode = request.headers.get("x-user-code") || request.cookies.get("user_code")?.value
+    const headers: Record<string, string> = { "Content-Type": "application/json" }
+    if (userCode) headers["X-User-Code"] = userCode
+
     // Call FastAPI backend
     const response = await fetch(
       `${BACKEND_URL}/imports/${encodeURIComponent(id)}/notices/${encodeURIComponent(noticeId)}`,
       {
         method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers,
         next: { revalidate: 0 },
       }
     );

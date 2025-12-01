@@ -10,11 +10,13 @@ export async function POST(
     const params = await context.params;
     const importId = params.id;
 
+    const userCode = request.headers.get("x-user-code") || request.cookies.get("user_code")?.value
+    const headers: Record<string, string> = { 'Content-Type': 'application/json' }
+    if (userCode) headers['X-User-Code'] = userCode
+
     const response = await fetch(`${BACKEND_URL}/imports/${importId}/sroi-analyze`, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
+      headers,
     });
 
     if (!response.ok) {

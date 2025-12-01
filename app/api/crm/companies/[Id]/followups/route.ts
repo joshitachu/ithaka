@@ -4,8 +4,11 @@ const BACKEND_URL = process.env.BACKEND_URL || "http://localhost:8000"
 
 export async function GET(request: NextRequest, { params }: { params: Promise<{ Id: string }> }) {
   try {
-    const { Id } = await params
-    const res = await fetch(`${BACKEND_URL}/crm/companies/${Id}/followups`)
+  const { Id } = await params
+  const userCode = request.headers.get("x-user-code") || request.cookies.get("user_code")?.value
+  const headers: Record<string, string> = {}
+  if (userCode) headers["X-User-Code"] = userCode
+  const res = await fetch(`${BACKEND_URL}/crm/companies/${Id}/followups`, { headers })
     const data = await res.json()
 
     if (!res.ok) {
@@ -23,12 +26,13 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
   try {
     const { Id } = await params
     const body = await request.json()
+    const userCode = request.headers.get("x-user-code") || request.cookies.get("user_code")?.value
+    const headers: Record<string, string> = { "Content-Type": "application/json" }
+    if (userCode) headers["X-User-Code"] = userCode
 
     const res = await fetch(`${BACKEND_URL}/crm/companies/${Id}/followups`, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
+      headers,
       body: JSON.stringify(body),
     })
 

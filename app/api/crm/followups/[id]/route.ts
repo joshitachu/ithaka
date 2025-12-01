@@ -6,12 +6,13 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
   try {
     const { id } = await params
     const body = await request.json()
+    const userCode = request.headers.get("x-user-code") || request.cookies.get("user_code")?.value
+    const headers: Record<string, string> = { "Content-Type": "application/json" }
+    if (userCode) headers["X-User-Code"] = userCode
 
     const res = await fetch(`${BACKEND_URL}/crm/followups/${id}`, {
       method: "PATCH",
-      headers: {
-        "Content-Type": "application/json",
-      },
+      headers,
       body: JSON.stringify(body),
     })
 

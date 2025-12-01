@@ -10,8 +10,13 @@ export async function GET(
     const params = await context.params;
     const importId = params.id;
 
+    const userCode = request.headers.get("x-user-code") || request.cookies.get("user_code")?.value
+    const headers: Record<string, string> = {}
+    if (userCode) headers['X-User-Code'] = userCode
+
     const response = await fetch(`${BACKEND_URL}/imports/${importId}/sroi-results`, {
       cache: 'no-store',
+      headers,
     });
 
     if (!response.ok) {
@@ -48,8 +53,13 @@ export async function DELETE(
   try {
     const { id: importId } = await context.params
 
+    const userCode = request.headers.get("x-user-code") || request.cookies.get("user_code")?.value
+    const headers: Record<string, string> = {}
+    if (userCode) headers['X-User-Code'] = userCode
+
     const response = await fetch(`${BACKEND_URL}/imports/${importId}/sroi-results`, {
       method: "DELETE",
+      headers,
     })
 
     if (!response.ok) {

@@ -10,8 +10,13 @@ export async function GET(
     const params = await context.params;
     const importId = params.id;
 
+    const userCode = request.headers.get("x-user-code") || request.cookies.get("user_code")?.value
+    const headers: Record<string, string> = {}
+    if (userCode) headers['X-User-Code'] = userCode
+
     const response = await fetch(`${BACKEND_URL}/imports/${importId}/sroi-status`, {
       cache: 'no-store', // Don't cache status checks
+      headers,
     });
 
     if (!response.ok) {

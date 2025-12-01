@@ -106,33 +106,41 @@ export default function SearchPage() {
 
   return (
     <main className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100">
-      <div className="max-w-7xl mx-auto p-8 space-y-8">
-        <header className="space-y-2">
-          <h1 className="text-3xl font-bold text-slate-900">Bedrijven Zoeken</h1>
-          <p className="text-slate-600">Zoek naar bedrijven en hun aanbestedingsgeschiedenis</p>
+      <div className="max-w-5xl lg:max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 space-y-6 sm:space-y-8">
+        <header className="space-y-1 sm:space-y-2">
+          <h1 className="text-2xl sm:text-3xl font-bold text-slate-900">
+            Bedrijven Zoeken
+          </h1>
+          <p className="text-sm sm:text-base text-slate-600">
+            Zoek naar bedrijven en hun aanbestedingsgeschiedenis
+          </p>
         </header>
 
         {/* Zoekblok */}
-        <section className="bg-white rounded-2xl shadow-sm border border-slate-200 p-8 space-y-6">
-          <div className="flex items-center gap-3 mb-6">
-            <div className="w-10 h-10 bg-purple-100 rounded-xl flex items-center justify-center">
-              <Search className="w-5 h-5 text-purple-600" />
+        <section className="bg-white rounded-2xl shadow-sm border border-slate-200 p-4 sm:p-6 lg:p-8 space-y-5 sm:space-y-6">
+          <div className="flex items-center gap-3 mb-2 sm:mb-4">
+            <div className="w-9 h-9 sm:w-10 sm:h-10 bg-purple-100 rounded-xl flex items-center justify-center">
+              <Search className="w-4 h-4 sm:w-5 sm:h-5 text-purple-600" />
             </div>
             <div>
-              <h2 className="text-lg font-semibold text-slate-900">Zoek Bedrijven</h2>
-              <p className="text-sm text-slate-600">
+              <h2 className="text-base sm:text-lg font-semibold text-slate-900">
+                Zoek Bedrijven
+              </h2>
+              <p className="text-xs sm:text-sm text-slate-600">
                 Vind bedrijven op naam en bekijk hun aanbestedingsgeschiedenis
               </p>
             </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-3 sm:gap-4">
             <div className="md:col-span-2">
-              <label className="block text-sm font-medium text-slate-700 mb-2">Bedrijfsnaam</label>
+              <label className="block text-xs sm:text-sm font-medium text-slate-700 mb-1.5 sm:mb-2">
+                Bedrijfsnaam
+              </label>
               <input
                 type="text"
                 placeholder="Voer bedrijfsnaam in..."
-                className="w-full border border-slate-300 rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
+                className="w-full border border-slate-300 rounded-lg px-3 sm:px-4 py-2.5 sm:py-3 text-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
                 value={companyQuery}
                 onChange={(e) => setCompanyQuery(e.target.value)}
                 onKeyDown={(e) => e.key === "Enter" && handleCompanySearch()}
@@ -140,11 +148,11 @@ export default function SearchPage() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-slate-700 mb-2">
+              <label className="block text-xs sm:text-sm font-medium text-slate-700 mb-1.5 sm:mb-2">
                 Jaren om te Zoeken
               </label>
               <select
-                className="w-full border border-slate-300 rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
+                className="w-full border border-slate-300 rounded-lg px-3 sm:px-4 py-2.5 sm:py-3 text-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
                 value={companyYears}
                 onChange={(e) => setCompanyYears(Number(e.target.value))}
               >
@@ -160,74 +168,80 @@ export default function SearchPage() {
           <button
             onClick={handleCompanySearch}
             disabled={loadingCompanySearch}
-            className="w-full flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-purple-600 text-white font-medium hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-sm hover:shadow-md"
+            className="w-full flex items-center justify-center gap-2 px-4 sm:px-6 py-2.5 sm:py-3 rounded-xl bg-purple-600 text-sm sm:text-base text-white font-medium hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-sm hover:shadow-md"
           >
-            <Search className="w-5 h-5" />
+            <Search className="w-4 h-4 sm:w-5 sm:h-5" />
             {loadingCompanySearch ? "Zoeken..." : "Zoeken"}
           </button>
         </section>
 
         {/* Resultaten */}
         {companySearchTotal > 0 && (
-          <section className="bg-white rounded-2xl shadow-sm border border-slate-200 p-8 space-y-6">
-            <div className="flex items-center justify-between">
+          <section className="bg-white rounded-2xl shadow-sm border border-slate-200 p-4 sm:p-6 lg:p-8 space-y-5 sm:space-y-6">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-green-100 rounded-xl flex items-center justify-center">
-                  <TrendingUp className="w-5 h-5 text-green-600" />
+                <div className="w-9 h-9 sm:w-10 sm:h-10 bg-green-100 rounded-xl flex items-center justify-center">
+                  <TrendingUp className="w-4 h-4 sm:w-5 sm:h-5 text-green-600" />
                 </div>
                 <div>
-                  <h2 className="text-lg font-semibold text-slate-900">Zoekresultaten</h2>
-                  <p className="text-sm text-slate-600">{companySearchTotal} bedrijven gevonden</p>
+                  <h2 className="text-base sm:text-lg font-semibold text-slate-900">
+                    Zoekresultaten
+                  </h2>
+                  <p className="text-xs sm:text-sm text-slate-600">
+                    {companySearchTotal} bedrijven gevonden
+                  </p>
                 </div>
               </div>
             </div>
 
-            <div className="grid grid-cols-1 gap-4">
+            <div className="grid grid-cols-1 gap-3 sm:gap-4">
               {companyResults.map((company, idx) => {
                 const prijs = formatPrice(company.bedrag, company.valuta)
 
                 return (
                   <div
                     key={idx}
-                    className="border border-slate-200 rounded-xl p-6 hover:border-purple-300 transition-colors"
+                    className="border border-slate-200 rounded-xl p-4 sm:p-6 hover:border-purple-300 transition-colors"
                   >
-                    <div className="flex items-start justify-between">
-                      <div className="flex-1">
-                        <div className="flex items-center gap-3 mb-2">
-                          <div className="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center">
-                            <Building2 className="w-5 h-5 text-purple-600" />
-                          </div>
-                          <div>
-                            <h3 className="text-lg font-bold text-slate-900">{company.bedrijf}</h3>
-                            <p className="text-sm text-slate-600">KVK: {company.kvk}</p>
-                            <p className="text-xs text-slate-500">Jaar: {company.year}</p>
-                          </div>
+                    <div className="flex flex-col gap-3">
+                      <div className="flex items-start gap-3">
+                        <div className="w-9 h-9 sm:w-10 sm:h-10 bg-purple-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                          <Building2 className="w-4 h-4 sm:w-5 sm:h-5 text-purple-600" />
                         </div>
+                        <div>
+                          <h3 className="text-base sm:text-lg font-bold text-slate-900 break-words">
+                            {company.bedrijf}
+                          </h3>
+                          <p className="text-xs sm:text-sm text-slate-600">
+                            KVK: {company.kvk}
+                          </p>
+                          <p className="text-xs text-slate-500 mt-0.5">Jaar: {company.year}</p>
+                        </div>
+                      </div>
 
-                        <div className="ml-3 space-y-2">
-                          <p className="text-sm text-slate-700">{company.omschrijving}</p>
+                      <div className="ml-0 sm:ml-3 space-y-2">
+                        <p className="text-sm text-slate-700">{company.omschrijving}</p>
 
-                          <div className="flex flex-wrap items-center gap-4 text-xs text-slate-600">
-                            <div className="flex items-center gap-1">
-                              <Calendar className="w-4 h-4" />
-                              <span>Gepubliceerd: {company.publicatiedatum}</span>
-                            </div>
-                            <div className="flex items-center gap-1">
-                              <TrendingUp className="w-4 h-4" />
-                              <span>{company.aantal_publicaties} publicaties</span>
-                            </div>
-                            {company.begindatum_opdracht && (
-                              <span>
-                                Contract: {company.begindatum_opdracht} –{" "}
-                                {company.einddatum_opdracht || "Lopend"}
-                              </span>
-                            )}
-                            {prijs && (
-                              <span className="font-medium text-emerald-700">
-                                Prijs: {prijs}
-                              </span>
-                            )}
+                        <div className="flex flex-wrap items-center gap-2 sm:gap-4 text-[11px] sm:text-xs text-slate-600">
+                          <div className="flex items-center gap-1">
+                            <Calendar className="w-3 h-3 sm:w-4 sm:h-4" />
+                            <span>Gepubliceerd: {company.publicatiedatum}</span>
                           </div>
+                          <div className="flex items-center gap-1">
+                            <TrendingUp className="w-3 h-3 sm:w-4 sm:h-4" />
+                            <span>{company.aantal_publicaties} publicaties</span>
+                          </div>
+                          {company.begindatum_opdracht && (
+                            <span>
+                              Contract: {company.begindatum_opdracht} –{" "}
+                              {company.einddatum_opdracht || "Lopend"}
+                            </span>
+                          )}
+                          {prijs && (
+                            <span className="font-medium text-emerald-700">
+                              Prijs: {prijs}
+                            </span>
+                          )}
                         </div>
                       </div>
                     </div>

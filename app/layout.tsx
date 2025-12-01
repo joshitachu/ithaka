@@ -3,7 +3,7 @@ import type { Metadata } from "next"
 import { Geist, Geist_Mono } from "next/font/google"
 import { Analytics } from "@vercel/analytics/next"
 import "./globals.css"
-// Import navbar component
+// Import navbar
 import { Sidebar } from "@/components/sidebar"
 
 const _geist = Geist({ subsets: ["latin"] })
@@ -44,6 +44,7 @@ export default function RootLayout({
           <Sidebar />
           <main className="flex-1 overflow-y-auto">{children}</main>
         </div>
+  {/* LoginGate removed from global layout; /login route now renders the login-only UI */}
         <Analytics />
       </body>
     </html>

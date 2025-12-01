@@ -14,7 +14,11 @@ export async function GET(request: NextRequest) {
     if (status) params.append("status", status)
     if (params.toString()) url += `?${params.toString()}`
 
-    const res = await fetch(url)
+  const userCode = request.headers.get("x-user-code") || request.cookies.get("user_code")?.value
+  const headers: Record<string, string> = {}
+  if (userCode) headers["X-User-Code"] = userCode
+
+  const res = await fetch(url, { headers })
     const data = await res.json()
 
     if (!res.ok) {
@@ -32,11 +36,13 @@ export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
 
+    const userCode = request.headers.get("x-user-code") || request.cookies.get("user_code")?.value
+    const headers: Record<string, string> = { "Content-Type": "application/json" }
+    if (userCode) headers["X-User-Code"] = userCode
+
     const res = await fetch(`${BACKEND_URL}/crm/companies`, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
+      headers,
       body: JSON.stringify(body),
     })
 

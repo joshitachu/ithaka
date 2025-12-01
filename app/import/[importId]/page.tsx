@@ -11,6 +11,7 @@ import {
   TrendingUp,
   MapPin,
   Clock,
+  Search,
 } from "lucide-react"
 
 type NoticeRow = {
@@ -121,7 +122,7 @@ export default function ImportDetailPage() {
 
   if (loading) {
     return (
-      <main className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 p-8">
+      <main className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 p-4 sm:p-8">
         <div className="max-w-7xl mx-auto">
           <div className="flex items-center justify-center py-20">
             <div className="text-center">
@@ -136,17 +137,17 @@ export default function ImportDetailPage() {
 
   if (error) {
     return (
-      <main className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 p-8">
+      <main className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 p-4 sm:p-8">
         <div className="max-w-7xl mx-auto">
           <button
             onClick={() => router.push("/imports")}
             className="flex items-center gap-2 text-slate-600 hover:text-slate-900 mb-6 transition-colors"
           >
             <ArrowLeft className="w-5 h-5" />
-            Terug naar imports
+            <span className="text-sm sm:text-base">Terug naar imports</span>
           </button>
-          <div className="bg-red-50 border border-red-200 rounded-xl p-6">
-            <p className="text-red-700">{error}</p>
+          <div className="bg-red-50 border border-red-200 rounded-xl p-4 sm:p-6">
+            <p className="text-red-700 text-sm sm:text-base">{error}</p>
           </div>
         </div>
       </main>
@@ -154,44 +155,50 @@ export default function ImportDetailPage() {
   }
 
   return (
-    <main className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 p-8">
-      <div className="max-w-7xl mx-auto space-y-6">
+    <main className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 p-4 sm:p-8">
+      <div className="max-w-7xl mx-auto space-y-4 sm:space-y-6">
         <button
           onClick={() => router.push("/imports")}
           className="flex items-center gap-2 text-slate-600 hover:text-slate-900 transition-colors"
         >
           <ArrowLeft className="w-5 h-5" />
-          Terug naar imports
+          <span className="text-sm sm:text-base">Terug naar imports</span>
         </button>
 
         {importData && (
-          <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 space-y-4">
-            <div className="flex items-start gap-4">
-              <div className="w-14 h-14 bg-blue-100 rounded-xl flex items-center justify-center flex-shrink-0">
-                <Database className="w-7 h-7 text-blue-600" />
+          <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-4 sm:p-6 space-y-4">
+            <div className="flex items-start gap-3 sm:gap-4">
+              <div className="w-12 h-12 sm:w-14 sm:h-14 bg-blue-100 rounded-xl flex items-center justify-center flex-shrink-0">
+                <Database className="w-6 h-6 sm:w-7 sm:h-7 text-blue-600" />
               </div>
-              <div className="flex-1 space-y-2">
-                <h1 className="text-2xl font-bold text-slate-900">{importData.name}</h1>
+              <div className="flex-1 space-y-2 min-w-0">
+                <h1 className="text-xl sm:text-2xl font-bold text-slate-900 break-words">
+                  {importData.name}
+                </h1>
 
-                <div className="flex flex-wrap items-center gap-4 text-sm text-slate-600">
+                <div className="flex flex-col sm:flex-row sm:flex-wrap sm:items-center gap-2 sm:gap-4 text-xs sm:text-sm text-slate-600">
                   <span className="flex items-center gap-1">
-                    <Calendar className="w-4 h-4" />
-                    {importData.date_from} tot {importData.date_to}
+                    <Calendar className="w-4 h-4 flex-shrink-0" />
+                    <span className="truncate">
+                      {importData.date_from} tot {importData.date_to}
+                    </span>
                   </span>
                   <span className="flex items-center gap-1">
-                    <FileText className="w-4 h-4" />
+                    <FileText className="w-4 h-4 flex-shrink-0" />
                     {importData.total_records ?? notices.length} records
                   </span>
                   {importData.region && (
                     <span className="flex items-center gap-1">
-                      <MapPin className="w-4 h-4" />
-                      Regio: {importData.region}
+                      <MapPin className="w-4 h-4 flex-shrink-0" />
+                      <span className="truncate">Regio: {importData.region}</span>
                     </span>
                   )}
                   <span className="flex items-center gap-1">
-                    <Clock className="w-4 h-4" />
-                    Aangemaakt op{" "}
-                    {new Date(importData.created_at).toLocaleString("nl-NL")}
+                    <Clock className="w-4 h-4 flex-shrink-0" />
+                    <span className="truncate">
+                      Aangemaakt op{" "}
+                      {new Date(importData.created_at).toLocaleString("nl-NL")}
+                    </span>
                   </span>
                 </div>
 
@@ -213,7 +220,7 @@ export default function ImportDetailPage() {
               </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-2">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 pt-2">
               <div className="bg-slate-50 border border-slate-200 rounded-xl p-3">
                 <p className="text-xs text-slate-500">Totaal notices</p>
                 <p className="text-xl font-semibold text-slate-900">
@@ -237,29 +244,99 @@ export default function ImportDetailPage() {
           </div>
         )}
 
-        <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 space-y-4">
-          <div className="flex items-center justify-between gap-4">
+        <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-4 sm:p-6 space-y-4">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-green-100 rounded-xl flex items-center justify-center">
+              <div className="w-10 h-10 bg-green-100 rounded-xl flex items-center justify-center flex-shrink-0">
                 <TrendingUp className="w-5 h-5 text-green-600" />
               </div>
               <div>
-                <h2 className="text-lg font-semibold text-slate-900">Notices</h2>
-                <p className="text-sm text-slate-600">
+                <h2 className="text-base sm:text-lg font-semibold text-slate-900">
+                  Notices
+                </h2>
+                <p className="text-xs sm:text-sm text-slate-600">
                   {filteredNotices.length} notices gevonden
                 </p>
               </div>
             </div>
-            <input
-              type="text"
-              placeholder="Zoek op titel, bedrijf, provincie..."
-              className="border border-slate-300 rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 w-64"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-            />
+            <div className="relative w-full sm:w-64">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-slate-400" />
+              <input
+                type="text"
+                placeholder="Zoek notices..."
+                className="w-full border border-slate-300 rounded-lg pl-10 pr-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+              />
+            </div>
           </div>
 
-          <div className="overflow-x-auto">
+          {/* Mobile Card View */}
+          <div className="block lg:hidden space-y-3">
+            {filteredNotices.map((notice) => (
+              <div
+                key={notice.id}
+                className="border border-slate-200 rounded-xl p-4 hover:bg-slate-50 cursor-pointer transition-colors"
+                onClick={() =>
+                  router.push(`/import/${params.importId}/notices/${notice.id}`)
+                }
+              >
+                <div className="space-y-2">
+                  <div className="flex items-start justify-between gap-2">
+                    <h3 className="text-sm font-semibold text-slate-900 flex-1">
+                      {notice.titel || (
+                        <span className="text-slate-400">Geen titel</span>
+                      )}
+                    </h3>
+                    {notice.heeft_eerdere_aanbestedingen && (
+                      <span className="inline-flex items-center px-2 py-1 rounded-full bg-emerald-50 text-emerald-700 text-xs font-medium border border-emerald-100 flex-shrink-0">
+                        {notice.aantal_eerdere_aanbestedingen}x
+                      </span>
+                    )}
+                  </div>
+
+                  <div className="text-xs text-slate-500 space-y-1">
+                    {notice.notice_id && (
+                      <div className="flex items-center gap-2">
+                        <span className="font-medium">ID:</span>
+                        <span>{notice.notice_id}</span>
+                      </div>
+                    )}
+                    {notice.win_bedrijf_naam && (
+                      <div className="flex items-start gap-2">
+                        <span className="font-medium flex-shrink-0">Winnaar:</span>
+                        <span className="flex-1">{notice.win_bedrijf_naam}</span>
+                      </div>
+                    )}
+                    {notice.buyer_bedrijf_naam && (
+                      <div className="flex items-start gap-2">
+                        <span className="font-medium flex-shrink-0">Inkoper:</span>
+                        <span className="flex-1">{notice.buyer_bedrijf_naam}</span>
+                      </div>
+                    )}
+                    {notice.province && (
+                      <div className="flex items-center gap-2">
+                        <span className="font-medium">Provincie:</span>
+                        <span>{notice.province}</span>
+                      </div>
+                    )}
+                  </div>
+
+                  {notice.bedrag && (
+                    <div className="pt-2 border-t border-slate-100">
+                      <span className="text-sm font-semibold text-slate-900">
+                        {notice.valuta || "€"}{" "}
+                        {notice.bedrag.toLocaleString("nl-NL")}
+                      </span>
+                    </div>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Desktop Table View */}
+          <div className="hidden lg:block overflow-x-auto">
             <table className="w-full">
               <thead>
                 <tr className="border-b border-slate-200">
@@ -336,14 +413,16 @@ export default function ImportDetailPage() {
                 ))}
               </tbody>
             </table>
-
-            {filteredNotices.length === 0 && (
-              <div className="text-center py-12">
-                <FileText className="w-12 h-12 text-slate-300 mx-auto mb-3" />
-                <p className="text-slate-600">Geen notices gevonden</p>
-              </div>
-            )}
           </div>
+
+          {filteredNotices.length === 0 && (
+            <div className="text-center py-12">
+              <FileText className="w-12 h-12 text-slate-300 mx-auto mb-3" />
+              <p className="text-slate-600 text-sm sm:text-base">
+                Geen notices gevonden
+              </p>
+            </div>
+          )}
         </div>
       </div>
     </main>
