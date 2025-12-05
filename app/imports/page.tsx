@@ -63,6 +63,8 @@ type Toast = {
 
 type PendingAction = { type: "deleteImport"; importId: string } | { type: "deleteSROI"; importId: string } | null
 
+type DateValidationModal = { show: boolean } | null
+
 export default function ImportsPage() {
   const router = useRouter()
   const [imports, setImports] = useState<ImportRow[]>([])
@@ -80,6 +82,7 @@ export default function ImportsPage() {
   const [loadingSROI, setLoadingSROI] = useState(false)
   const [toast, setToast] = useState<Toast | null>(null)
   const [pendingAction, setPendingAction] = useState<PendingAction>(null)
+  const [showDateValidation, setShowDateValidation] = useState(false)
 
   const showToast = (payload: Toast) => {
     setToast(payload)
@@ -162,6 +165,11 @@ export default function ImportsPage() {
   }, [sroiStatus])
 
   const handleStartImport = async () => {
+    if (!dateFrom || !dateTo) {
+      setShowDateValidation(true)
+      return
+    }
+
     setLoading(true)
     setMessage(null)
     try {
@@ -390,6 +398,39 @@ export default function ImportsPage() {
             <button onClick={closeToast} className="p-1 rounded-full hover:bg-slate-100 transition-colors shrink-0">
               <X className="w-4 h-4 text-slate-500" />
             </button>
+          </div>
+        </div>
+      )}
+
+      {showDateValidation && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-black/40" onClick={() => setShowDateValidation(false)} />
+          <div className="relative bg-white rounded-2xl shadow-xl border border-slate-200 max-w-md w-full p-6 space-y-4">
+            <div className="flex items-start gap-4">
+              <div className="w-12 h-12 shrink-0 rounded-full bg-blue-100 flex items-center justify-center">
+                <Calendar className="w-6 h-6 text-blue-600" />
+              </div>
+              <div className="flex-1">
+                <h3 className="text-lg font-semibold text-slate-900">Datumbereik vereist</h3>
+                <p className="mt-2 text-sm text-slate-600">
+                  Vul eerst de begindatum en einddatum in voordat je de import start.
+                </p>
+              </div>
+              <button
+                onClick={() => setShowDateValidation(false)}
+                className="p-1 shrink-0 rounded-full hover:bg-slate-100 transition-colors"
+              >
+                <X className="w-4 h-4 text-slate-500" />
+              </button>
+            </div>
+            <div className="flex justify-end pt-2">
+              <button
+                onClick={() => setShowDateValidation(false)}
+                className="px-6 py-2.5 text-sm rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition-colors font-medium"
+              >
+                Begrepen
+              </button>
+            </div>
           </div>
         </div>
       )}
