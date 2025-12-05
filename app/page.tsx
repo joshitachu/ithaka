@@ -13,7 +13,7 @@ export default function HomePage() {
               <Database className="w-8 h-8 text-white" />
             </div>
           </div>
-          <h1 className="text-5xl font-bold text-slate-900">Welkom bij TenderNed</h1>
+          <h1 className="text-5xl font-bold text-slate-900">Welkom bij SROI Insight</h1>
           <p className="text-xl text-slate-600 max-w-2xl mx-auto">
             Uw uitgebreide platform voor het importeren, analyseren en beheren van aanbestedingsgegevens met
             geavanceerde SROI-compliance monitoring en CRM-mogelijkheden.
