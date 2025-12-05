@@ -825,7 +825,7 @@ export default function ImportsPage() {
                         <Download className="w-3.5 h-3.5" />
                         CSV
                       </button>
-                      {!hasResults && !isAnalyzing && (
+                      {/* {!hasResults && !isAnalyzing && (
                         <button
                           onClick={() => handleStartSROI(imp.id)}
                           className="w-full px-3 py-2 bg-amber-100 text-amber-700 rounded-lg text-xs font-medium hover:bg-amber-200 transition-colors flex items-center justify-center gap-1.5"
@@ -851,7 +851,7 @@ export default function ImportsPage() {
                             Reset
                           </button>
                         </>
-                      )}
+                      )} */}
                       <button
                         onClick={() => handleDeleteImport(imp.id)}
                         className="w-full px-3 py-2 bg-slate-100 text-slate-700 rounded-lg text-xs font-medium hover:bg-slate-200 transition-colors flex items-center justify-center gap-1.5"
