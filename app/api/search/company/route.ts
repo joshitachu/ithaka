@@ -26,6 +26,9 @@ export async function GET(request: Request) {
     const headers: Record<string, string> = { "Content-Type": "application/json" }
     if (userCode) headers["X-User-Code"] = userCode
 
+
+    console.log("🔍 Fetching:", backendUrl);
+    console.log("📦 Headers:", headers);
     const backendResponse = await fetch(backendUrl, {
       headers,
     });

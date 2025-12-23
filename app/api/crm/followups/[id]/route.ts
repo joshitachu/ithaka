@@ -1,30 +1,54 @@
-import { type NextRequest, NextResponse } from "next/server"
+import { NextResponse } from "next/server"
 
-const BACKEND_URL = process.env.BACKEND_URL || "http://localhost:8000"
+const BACKEND_URL = process.env.BACKEND_UL || "http://localhost:8000"
 
-export async function PATCH(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+// PATCH - Update a followup in Salesforce
+export async function PATCH(request: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
     const { id } = await params
     const body = await request.json()
-    const userCode = request.headers.get("x-user-code") || request.cookies.get("user_code")?.value
-    const headers: Record<string, string> = { "Content-Type": "application/json" }
-    if (userCode) headers["X-User-Code"] = userCode
 
-    const res = await fetch(`${BACKEND_URL}/crm/followups/${id}`, {
+    const response = await fetch(`${BACKEND_URL}/api/followups/${id}`, {
       method: "PATCH",
-      headers,
+      headers: {
+        "Content-Type": "application/json",
+      },
       body: JSON.stringify(body),
     })
 
-    const data = await res.json()
-
-    if (!res.ok) {
-      return NextResponse.json(data, { status: res.status })
+    if (!response.ok) {
+      const error = await response.text()
+      return NextResponse.json({ error: `Failed to update followup: ${error}` }, { status: response.status })
     }
 
+    const data = await response.json()
     return NextResponse.json(data)
-  } catch (error: any) {
-    console.error("[API] Error updating followup:", error)
-    return NextResponse.json({ error: "Failed to update followup", details: error.message }, { status: 500 })
+  } catch (error) {
+    console.error("Error updating followup:", error)
+    return NextResponse.json({ error: "Failed to connect to backend" }, { status: 500 })
+  }
+}
+
+// DELETE a followup from Salesforce
+export async function DELETE(request: Request, { params }: { params: Promise<{ id: string }> }) {
+  try {
+    const { id } = await params
+
+    const response = await fetch(`${BACKEND_URL}/api/followups/${id}`, {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    })
+
+    if (!response.ok) {
+      const error = await response.text()
+      return NextResponse.json({ error: `Failed to delete followup: ${error}` }, { status: response.status })
+    }
+
+    return NextResponse.json({ success: true })
+  } catch (error) {
+    console.error("Error deleting followup:", error)
+    return NextResponse.json({ error: "Failed to connect to backend" }, { status: 500 })
   }
 }
