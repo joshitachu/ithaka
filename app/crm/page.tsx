@@ -380,10 +380,11 @@ export default function CRMPage() {
               onChange={(e) => setStatusFilter(e.target.value)}
             >
               <option value="">Alle statussen</option>
-              <option value="new">Nieuw</option>
-              <option value="contacted">Gecontacteerd</option>
+              <option value="New">Nieuw</option>
+              <option value="Unqualified">Ongekwalificeerd</option>
+              <option value="Contacted">Gecontacteerd</option>
               <option value="interested">Geïnteresseerd</option>
-              <option value="not_interested">Niet geïnteresseerd</option>
+              <option value="Converted">Geconverteerd</option>
             </select>
             <button
               onClick={handleSearch}
@@ -467,10 +468,10 @@ export default function CRMPage() {
                             onChange={(e) => handleUpdateStatus(company.id, e.target.value)}
                             className="text-xs border border-slate-200 rounded px-2 py-1 focus:outline-none focus:ring-2 focus:ring-emerald-400"
                           >
-                            <option value="new">Nieuw</option>
-                            <option value="contacted">Gecontacteerd</option>
-                            <option value="interested">Geïnteresseerd</option>
-                            <option value="not_interested">Niet geïnteresseerd</option>
+                           <option value="New">Nieuw</option>
+                          <option value="Contacted">Gecontacteerd</option>
+                          <option value="interested">Geïnteresseerd</option>
+                          <option value="Converted">Geconverteerd</option>
                           </select>
                         </td>
                         <td className="p-3 text-slate-600 text-xs">
@@ -546,10 +547,10 @@ export default function CRMPage() {
                         onChange={(e) => handleUpdateStatus(company.id, e.target.value)}
                         className="text-xs border border-slate-200 rounded px-2 py-1 focus:outline-none focus:ring-2 focus:ring-emerald-400 flex-1"
                       >
-                        <option value="new">Nieuw</option>
-                        <option value="contacted">Gecontacteerd</option>
-                        <option value="interested">Geïnteresseerd</option>
-                        <option value="not_interested">Niet geïnteresseerd</option>
+                        <option value="New">Nieuw</option>
+              <option value="Nurtering">Gecontacteerd</option>
+              <option value="interested">Geïnteresseerd</option>
+              <option value="Converted">Geconverteerd</option>
                       </select>
                       <button
                         onClick={() => handleViewDetails(company)}
@@ -647,10 +648,10 @@ export default function CRMPage() {
                     value={formStatus}
                     onChange={(e) => setFormStatus(e.target.value)}
                   >
-                    <option value="new">Nieuw</option>
-                    <option value="contacted">Gecontacteerd</option>
-                    <option value="interested">Geïnteresseerd</option>
-                    <option value="not_interested">Niet geïnteresseerd</option>
+                    <option value="Unqualified">Ongekwalificeerd</option>
+              <option value="Contacted">Gecontacteerd</option>
+              <option value="interested">Geïnteresseerd</option>
+              <option value="Converted">Geconverteerd</option>
                   </select>
                 </div>
                 <div>

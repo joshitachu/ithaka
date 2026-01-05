@@ -3,13 +3,13 @@ import { NextResponse } from "next/server"
 const BACKEND_URL = process.env.BACKEND_URL || "http://localhost:8000"
 
 // PATCH - Update a followup in Salesforce
-export async function PATCH(request: Request, { params }: { params: Promise<{ Id: string }> }) {
+export async function PATCH(request: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
-    const { Id } = await params
+    const { id } = await params
     const body = await request.json()
     
     
-    const response = await fetch(`${BACKEND_URL}/api/followups/${Id}`, {
+    const response = await fetch(`${BACKEND_URL}/api/followups/${id}`, {
       method: "PATCH",
       headers: {
         "Content-Type": "application/json",
@@ -31,11 +31,11 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ Id
 }
 
 // DELETE a followup from Salesforce
-export async function DELETE(request: Request, { params }: { params: Promise<{ Id: string }> }) {
+export async function DELETE(request: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
-    const { Id } = await params
+    const { id } = await params
     
-    const response = await fetch(`${BACKEND_URL}/api/followups/${Id}`, {
+    const response = await fetch(`${BACKEND_URL}/api/followups/${id}`, {
       method: "DELETE",
       headers: {
         "Content-Type": "application/json",
