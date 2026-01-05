@@ -191,9 +191,17 @@ export default function CRMPage() {
     try {
       const res = await fetch(`/api/crm/companies/${company.id}/followups`)
       const data = await res.json()
-      setFollowups(data)
+      if (!res.ok || !Array.isArray(data)) {
+        setFollowups([])
+        if (!res.ok) {
+          showNotification("error", data.error || "Fout bij laden van follow-ups")
+        }
+      } else {
+        setFollowups(data)
+      }
     } catch (err) {
       console.error("Fout bij laden followups", err)
+      setFollowups([])
       showNotification("error", "Fout bij laden van follow-ups")
     }
   }

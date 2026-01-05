@@ -1,13 +1,13 @@
 import { NextResponse } from "next/server"
 
-const BACKEND_URL = process.env.BACKEND_UL || "http://localhost:8000"
+const BACKEND_URL = process.env.BACKEND_URL || "http://localhost:8000"
 
 // GET a single company from Salesforce
-export async function GET(request: Request, { params }: { params: Promise<{ id: string }> }) {
+export async function GET(request: Request, { params }: { params: Promise<{ Id: string }> }) {
   try {
-    const { id } = await params
-
-    const response = await fetch(`${BACKEND_URL}/api/companies/${id}`, {
+    const { Id } = await params
+    
+    const response = await fetch(`${BACKEND_URL}/api/companies/${Id}`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -28,12 +28,12 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
 }
 
 // PATCH - Update a company in Salesforce
-export async function PATCH(request: Request, { params }: { params: Promise<{ id: string }> }) {
+export async function PATCH(request: Request, { params }: { params: Promise<{ Id: string }> }) {
   try {
-    const { id } = await params
+    const { Id } = await params
     const body = await request.json()
-
-    const response = await fetch(`${BACKEND_URL}/api/companies/${id}`, {
+    
+    const response = await fetch(`${BACKEND_URL}/api/companies/${Id}`, {
       method: "PATCH",
       headers: {
         "Content-Type": "application/json",
@@ -55,11 +55,11 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
 }
 
 // DELETE a company from Salesforce
-export async function DELETE(request: Request, { params }: { params: Promise<{ id: string }> }) {
+export async function DELETE(request: Request, { params }: { params: Promise<{ Id: string }> }) {
   try {
-    const { id } = await params
-
-    const response = await fetch(`${BACKEND_URL}/api/companies/${id}`, {
+    const { Id } = await params
+    
+    const response = await fetch(`${BACKEND_URL}/api/companies/${Id}`, {
       method: "DELETE",
       headers: {
         "Content-Type": "application/json",

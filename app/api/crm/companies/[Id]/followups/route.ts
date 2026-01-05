@@ -3,11 +3,11 @@ import { NextResponse } from "next/server"
 const BACKEND_URL = process.env.BACKEND_UL || "http://localhost:8000"
 
 // GET all followups for a company from Salesforce
-export async function GET(request: Request, { params }: { params: Promise<{ id: string }> }) {
+export async function GET(request: Request, { params }: { params: Promise<{ Id  : string }> }) {
   try {
-    const { id } = await params
-
-    const response = await fetch(`${BACKEND_URL}/api/companies/${id}/followups`, {
+    const { Id } = await params
+    
+    const response = await fetch(`${BACKEND_URL}/api/companies/${Id}/followups`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -28,12 +28,12 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
 }
 
 // POST - Create a new followup for a company in Salesforce
-export async function POST(request: Request, { params }: { params: Promise<{ id: string }> }) {
+export async function POST(request: Request, { params }: { params: Promise<{ Id: string }> }) {
   try {
-    const { id } = await params
+    const { Id } = await params
     const body = await request.json()
-
-    const response = await fetch(`${BACKEND_URL}/api/companies/${id}/followups`, {
+    
+    const response = await fetch(`${BACKEND_URL}/api/companies/${Id}/followups`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

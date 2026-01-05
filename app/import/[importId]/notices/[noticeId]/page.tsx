@@ -58,16 +58,30 @@ type NoticeDetail = {
   updated_at?: string
 }
 
-// matches crm_create_company docstring
+// Mapped to Salesforce Lead fields
 type CrmCompanyPayload = {
-  name: string
-  website?: string | null
-  kvk?: string | null
-  contact_name?: string | null
-  contact_email?: string | null
-  source_notice_id?: string | null
-  notes?: string | null
-  lead_status?: string | null
+  name: string                          // -> LastName (required)
+  contact_name?: string | null          // -> LastName (if different from company)
+  contact_email?: string | null         // -> Email
+  contact_phone?: string | null         // -> Phone
+  mobile?: string | null                // -> MobilePhone
+  website?: string | null               // -> Website
+  title?: string | null                 // -> Title
+  industry?: string | null              // -> Industry
+  notes?: string | null                 // -> Description
+  lead_status?: string | null           // -> Status
+  lead_source?: string | null           // -> LeadSource
+  annual_revenue?: number | null        // -> AnnualRevenue
+  num_employees?: number | null         // -> NumberOfEmployees
+  
+  // Additional Salesforce Lead fields
+  company?: string | null               // -> Company
+  city?: string | null                  // -> City
+  country?: string | null               // -> Country
+  street?: string | null                // -> Street
+  state_province?: string | null        // -> State/Province
+  postal_code?: string | null           // -> PostalCode
+  kvk?: string | null                   // -> Custom field for KVK number
 }
 
 export default function NoticeDetailPage() {
@@ -77,7 +91,6 @@ export default function NoticeDetailPage() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
-  // CRM state – alleen nog voor winnaar
   const [crmLoading, setCrmLoading] = useState<boolean>(false)
   const [crmSuccess, setCrmSuccess] = useState<string | null>(null)
   const [crmError, setCrmError] = useState<string | null>(null)
@@ -132,6 +145,16 @@ export default function NoticeDetailPage() {
     )
   }
 
+  // Helper to safely format strings (remove null/undefined)
+  const safeString = (val: string | null | undefined): string | undefined => {
+    return val?.trim() || undefined
+  }
+
+  // Helper to safely format numbers
+  const safeNumber = (val: number | null | undefined): number | undefined => {
+    return typeof val === 'number' && !isNaN(val) ? val : undefined
+  }
+
   const createCrmCompany = async () => {
     if (!notice) return
 
@@ -141,37 +164,172 @@ export default function NoticeDetailPage() {
 
     try {
       if (!notice.win_bedrijf_naam) {
-        throw new Error("Geen bedrijfsnaam voor winnaar beschikbaar")
+        throw new Error("❌ Geen bedrijfsnaam voor winnaar beschikbaar")
       }
 
+      // Build comprehensive notes with all available information
+      const notesComponents: string[] = [
+        `Automatisch aangemaakt vanuit winnaar van TenderNed notice`,
+        notice.titel ? `\n\n📋 Notice: ${notice.titel}` : "",
+        notice.omschrijving ? `\n\n📝 Omschrijving:\n${notice.omschrijving}` : "",
+        notice.notice_id ? `\n\n🔢 Notice ID: ${notice.notice_id}` : "",
+        notice.publicatie_id ? `\n📰 Publicatie ID: ${notice.publicatie_id}` : "",
+        notice.bedrag ? `\n💰 Contractwaarde: ${notice.valuta || "€"} ${notice.bedrag.toLocaleString("nl-NL")}` : "",
+        notice.win_kvk ? `\n🏢 KVK: ${notice.win_kvk}` : "",
+        notice.heeft_eerdere_aanbestedingen ? 
+          `\n📊 Eerdere aanbestedingen: ${notice.aantal_eerdere_aanbestedingen}` : 
+          "\n📊 Geen eerdere aanbestedingen bekend",
+        notice.buyer_bedrijf_naam ? `\n\n👔 Aanbesteed door: ${notice.buyer_bedrijf_naam}` : "",
+        notice.publicatie_id ? 
+          `\n\n🔗 TenderNed Link: https://www.tenderned.nl/aankondigingen/overzicht/${notice.publicatie_id}` : "",
+      ]
+
+      const notesText = notesComponents.filter(Boolean).join("")
+
+      // Map notice data to Salesforce Lead fields - ONLY WINNER DATA
       const payload: CrmCompanyPayload = {
-        name: notice.win_bedrijf_naam,
-        website: notice.win_website,
-        kvk: notice.win_kvk,
-        contact_name: notice.win_contact_naam,
-        contact_email: notice.win_contact_email,
-        source_notice_id: notice.notice_id ?? notice.id,
-        notes: `Automatisch aangemaakt vanuit winnaar van notice: "${notice.titel ?? ""}"`,
-        lead_status: "new",
+        // Required field - use company name as LastName
+        name: safeString(notice.win_bedrijf_naam)!,
+        
+        // Company field - same as name for business leads
+        company: safeString(notice.win_bedrijf_naam),
+        
+        // Contact details
+        contact_name: safeString(notice.win_contact_naam),
+        contact_email: safeString(notice.win_contact_email),
+        contact_phone: safeString(notice.win_contact_tel),
+        
+        // Website
+        website: safeString(notice.win_website),
+        
+        // Title - use "Contactpersoon" as default if we have a contact name
+        title: notice.win_contact_naam ? "Contactpersoon" : undefined,
+        
+        // Winner Address fields - mapped to Salesforce address fields
+        street: safeString(notice.win_straat),
+        city: safeString(notice.win_plaats),
+        postal_code: safeString(notice.win_postcode),
+        state_province: safeString(notice.province),
+        country: safeString(notice.win_land),
+        kvk: safeString(notice.win_kvk),
+        
+        // Lead management
+        lead_status: "Open - Not Contacted",
+        lead_source: "TenderNed",
+        
+        // Financial data
+        annual_revenue: safeNumber(notice.bedrag),
+        
+        // Notes with all context (includes buyer name for reference)
+        notes: notesText,
       }
+
+      // Remove undefined values (backend handles null)
+      const cleanPayload = Object.fromEntries(
+        Object.entries(payload).filter(([_, v]) => v !== undefined)
+      ) as CrmCompanyPayload
+
+      console.log("📤 Sending CRM payload:", cleanPayload)
 
       const res = await fetch("/api/crm/companies", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(payload),
+        body: JSON.stringify(cleanPayload),
       })
 
       if (!res.ok) {
         const txt = await res.text()
-        throw new Error(`CRM-fout (${res.status}): ${txt || res.statusText || "onbekende fout"}`)
+        let errorMsg = ""
+        let errorDetails: any = null
+
+        try {
+          errorDetails = JSON.parse(txt)
+          console.error("🔍 Backend error response:", errorDetails)
+
+          // Handle 409 Conflict (Duplicate)
+          if (res.status === 409) {
+            if (errorDetails.detail && typeof errorDetails.detail === 'object') {
+              const { error, salesforce_id, company, status } = errorDetails.detail
+              errorMsg = `🔄 ${error || "Lead bestaat al"}\n\n` +
+                        `📋 Bestaande gegevens:\n` +
+                        `• Bedrijf: ${company || "Onbekend"}\n` +
+                        `• Status: ${status || "Onbekend"}\n` +
+                        `• Salesforce ID: ${salesforce_id || "Onbekend"}\n\n` +
+                        `💡 Tip: Deze lead bestaat al in Salesforce. Check of het email adres (${cleanPayload.contact_email || "geen email"}) uniek is.`
+            } else {
+              errorMsg = `🔄 Duplicaat: Deze lead bestaat al in Salesforce (${cleanPayload.contact_email || cleanPayload.name})`
+            }
+          }
+          // Handle 500 Internal Server Error
+          else if (res.status === 500) {
+            if (errorDetails.detail) {
+              errorMsg = `⚠️ Server fout: ${errorDetails.detail}\n\n` +
+                        `🔍 Dit kan betekenen:\n` +
+                        `• Salesforce API is niet bereikbaar\n` +
+                        `• Een verplicht veld ontbreekt\n` +
+                        `• Validatie fout in Salesforce\n\n` +
+                        `📋 Verstuurde data:\n${JSON.stringify(cleanPayload, null, 2)}`
+            } else {
+              errorMsg = `⚠️ Server fout: Kon lead niet aanmaken in Salesforce`
+            }
+          }
+          // Handle 400 Bad Request
+          else if (res.status === 400) {
+            errorMsg = `❌ Ongeldige data: ${errorDetails.detail || "Controleer of alle velden correct zijn"}\n\n` +
+                      `📋 Verstuurde data:\n${JSON.stringify(cleanPayload, null, 2)}`
+          }
+          // Handle 422 Unprocessable Entity
+          else if (res.status === 422) {
+            if (errorDetails.detail && Array.isArray(errorDetails.detail)) {
+              const validationErrors = errorDetails.detail.map((err: any) => 
+                `• ${err.loc?.join(' → ') || 'Unknown field'}: ${err.msg}`
+              ).join('\n')
+              errorMsg = `⚠️ Validatie fout:\n\n${validationErrors}\n\n` +
+                        `📋 Verstuurde data:\n${JSON.stringify(cleanPayload, null, 2)}`
+            } else {
+              errorMsg = `⚠️ Validatie fout: ${errorDetails.detail || "Controleer de invoer"}`
+            }
+          }
+          // Generic error with detail
+          else if (errorDetails.detail) {
+            if (typeof errorDetails.detail === 'string') {
+              errorMsg = `❌ Fout (${res.status}): ${errorDetails.detail}`
+            } else if (errorDetails.detail.error) {
+              errorMsg = `❌ Fout (${res.status}): ${errorDetails.detail.error}`
+            } else {
+              errorMsg = `❌ Fout (${res.status}): ${JSON.stringify(errorDetails.detail)}`
+            }
+          }
+        } catch (parseError) {
+          console.error("🔍 Could not parse error response:", txt)
+          errorMsg = `❌ CRM-fout (${res.status}): ${txt || res.statusText || "Onbekende fout"}\n\n` +
+                    `📋 Verstuurde data:\n${JSON.stringify(cleanPayload, null, 2)}`
+        }
+
+        throw new Error(errorMsg)
       }
 
       const created = await res.json()
-      setCrmSuccess(`CRM-bedrijf aangemaakt (#${created.id ?? "?"}) voor winnaar`)
+      console.log("✅ CRM Lead created:", created)
+      setCrmSuccess(
+        `✅ CRM Lead aangemaakt!\n\n` +
+        `• Bedrijf: ${notice.win_bedrijf_naam}\n` +
+        `• Salesforce ID: ${created.id || "?"}\n` +
+        `• Email: ${cleanPayload.contact_email || "Geen email"}\n` +
+        `• Status: ${cleanPayload.lead_status}`
+      )
     } catch (e: any) {
-      setCrmError(e.message || "Kon CRM-bedrijf niet aanmaken")
+      const errorMessage = e.message || "Kon CRM-lead niet aanmaken"
+      setCrmError(errorMessage)
+      console.error("❌ CRM Error Details:", {
+        message: e.message,
+        stack: e.stack,
+        notice: notice?.notice_id,
+        company: notice?.win_bedrijf_naam,
+        email: notice?.win_contact_email
+      })
     } finally {
       setCrmLoading(false)
     }
