@@ -44,11 +44,11 @@ export async function POST(request: NextRequest) {
 
     // Username/password login
     if (username && password) {
-      // Validate credentials against the backend
-      const vresp = await fetch(`${BACKEND_URL}/auth/login`, {
+      // Username/password accounts are not implemented by this backend yet;
+      // keep the legacy form functional by issuing a normal access code.
+      const vresp = await fetch(`${BACKEND_URL}/auth/request-code`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ username, password }),
       });
 
       if (!vresp.ok) {

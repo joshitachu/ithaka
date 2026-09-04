@@ -16,11 +16,13 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Send registration request to backend
-    const vresp = await fetch(`${BACKEND_URL}/auth/register`, {
+    // The backend intentionally uses generated access codes; it does not have
+    // a username/password account service. Keep this legacy form useful by
+    // issuing the same code as the Code tab instead of calling a nonexistent
+    // /auth/register endpoint.
+    const vresp = await fetch(`${BACKEND_URL}/auth/request-code`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ username, password }),
     });
 
     if (!vresp.ok) {
