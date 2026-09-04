@@ -23,6 +23,8 @@ type ImportRow = {
   date_to: string | null
   total_records: number | null
   created_at: string
+  status: "pending" | "running" | "completed" | "partial" | "failed"
+  error_message?: string | null
 }
 
 type SROIStatus = {
@@ -54,6 +56,8 @@ type SROIResult = {
   summary: string
   pages_checked: number
   error: string | null
+  analysis_method?: string | null
+  verdict?: string | null
 }
 
 type Toast = {
@@ -64,6 +68,14 @@ type Toast = {
 type PendingAction = { type: "deleteImport"; importId: string } | { type: "deleteSROI"; importId: string } | null
 
 type DateValidationModal = { show: boolean } | null
+
+function importRunLabel(importRow: ImportRow) {
+  if (importRow.status === "pending") return "Import wacht"
+  if (importRow.status === "running") return "Import bezig"
+  if (importRow.status === "partial") return "Import gedeeltelijk"
+  if (importRow.status === "failed") return "Import mislukt"
+  return null
+}
 
 export default function ImportsPage() {
   const router = useRouter()
@@ -164,6 +176,17 @@ export default function ImportsPage() {
     return () => clearInterval(interval)
   }, [sroiStatus])
 
+  // An import now runs in the backend after POST /imports has returned. Refresh
+  // the list while one is active so its count and outcome appear without a page reload.
+  useEffect(() => {
+    if (!imports.some((imp) => imp.status === "pending" || imp.status === "running")) return
+
+    const interval = window.setInterval(() => {
+      loadImports()
+    }, 2000)
+    return () => window.clearInterval(interval)
+  }, [imports])
+
   const handleStartImport = async () => {
     if (!dateFrom || !dateTo) {
       setShowDateValidation(true)
@@ -194,7 +217,7 @@ export default function ImportsPage() {
         setMessage(msg)
         showToast({ type: "error", message: msg })
       } else {
-        const msg = `Import gestart: ${data.name} (${data.total_records} records)`
+        const msg = `Import gestart: ${data.name}. Voortgang verschijnt hieronder.`
         setMessage(msg)
         showToast({ type: "success", message: msg })
         await loadImports()
@@ -672,7 +695,14 @@ export default function ImportsPage() {
                         <td className="py-3 px-4 text-sm text-slate-900">{imp.name}</td>
                         <td className="py-3 px-4 text-sm text-slate-600">{imp.date_from || "-"}</td>
                         <td className="py-3 px-4 text-sm text-slate-600">{imp.date_to || "-"}</td>
-                        <td className="py-3 px-4 text-sm text-slate-600">{imp.total_records ?? 0}</td>
+                        <td className="py-3 px-4 text-sm text-slate-600">
+                          <div>{imp.total_records ?? 0}</div>
+                          {importRunLabel(imp) && (
+                            <div className={imp.status === "failed" ? "text-xs text-red-600" : "text-xs text-blue-600"}>
+                              {importRunLabel(imp)}
+                            </div>
+                          )}
+                        </td>
                         <td className="py-3 px-4">
                           {status?.status === "completed" ? (
                             <span className="inline-flex items-center gap-1 px-2 py-1 rounded-md bg-green-100 text-green-700 text-xs font-medium">
@@ -777,6 +807,7 @@ export default function ImportsPage() {
                           <p>Van: {imp.date_from || "-"}</p>
                           <p>Tot: {imp.date_to || "-"}</p>
                           <p>Records: {imp.total_records ?? 0}</p>
+                          {importRunLabel(imp) && <p className={imp.status === "failed" ? "text-red-600" : "text-blue-600"}>{importRunLabel(imp)}</p>}
                         </div>
                       </div>
                       <div>
@@ -946,6 +977,11 @@ export default function ImportsPage() {
                               <h3 className="font-semibold text-slate-900 text-base sm:text-lg truncate">
                                 {result.winner_name || "Onbekend bedrijf"}
                               </h3>
+                              {result.verdict === "insufficient_evidence" && (
+                                <span className="px-2 py-1 bg-amber-100 text-amber-800 text-xs font-medium rounded-lg whitespace-nowrap shrink-0">
+                                  Onvoldoende bewijs
+                                </span>
+                              )}
                               {result.sroi_compliant ? (
                                 <span className="px-2 sm:px-3 py-1 bg-green-100 text-green-700 text-xs font-medium rounded-lg whitespace-nowrap shrink-0">
                                   ✅

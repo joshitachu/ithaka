@@ -1,19 +1,15 @@
 import { NextResponse } from "next/server"
+import { BACKEND_URL, backendHeaders } from "@/lib/backend"
 
-const BACKEND_URL = process.env.BACKEND_URL || "http://localhost:8000"
-
-// PATCH - Update a followup in Salesforce
+// PATCH - Update a followup
 export async function PATCH(request: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
     const { id } = await params
     const body = await request.json()
-    
-    
-    const response = await fetch(`${BACKEND_URL}/api/followups/${id}`, {
+
+    const response = await fetch(`${BACKEND_URL}/crm/followups/${id}`, {
       method: "PATCH",
-      headers: {
-        "Content-Type": "application/json",
-      },
+      headers: backendHeaders(request),
       body: JSON.stringify(body),
     })
 
@@ -30,16 +26,16 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
   }
 }
 
-// DELETE a followup from Salesforce
+// DELETE a followup
+// NOTE: the backend exposes no DELETE /crm/followups/{id}; this proxies through
+// and will surface the backend's 405 until that route exists.
 export async function DELETE(request: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
     const { id } = await params
-    
-    const response = await fetch(`${BACKEND_URL}/api/followups/${id}`, {
+
+    const response = await fetch(`${BACKEND_URL}/crm/followups/${id}`, {
       method: "DELETE",
-      headers: {
-        "Content-Type": "application/json",
-      },
+      headers: backendHeaders(request),
     })
 
     if (!response.ok) {

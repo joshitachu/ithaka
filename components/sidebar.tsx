@@ -2,7 +2,7 @@
 
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { Home, Upload, Search, Users, Building2, Menu, X } from "lucide-react"
+import { Home, Upload, Search, Users, Building2, Menu, X, BarChart3 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { useRouter } from "next/navigation"
 import { useCallback, useState, useEffect } from "react"
@@ -12,6 +12,7 @@ const navigation = [
   { name: "Imports", href: "/imports", icon: Upload },
   { name: "Zoeken", href: "/search", icon: Search },
   { name: "CRM", href: "/crm", icon: Users },
+  { name: "Analyse", href: "/analytics", icon: BarChart3 },
 ]
 
 export function Sidebar() {

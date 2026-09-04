@@ -1,17 +1,14 @@
 import { NextResponse } from "next/server"
+import { BACKEND_URL, backendHeaders } from "@/lib/backend"
 
-const BACKEND_URL = process.env.BACKEND_URL || "http://localhost:8000"
-
-// GET a single company from Salesforce
+// GET a single company
 export async function GET(request: Request, { params }: { params: Promise<{ Id: string }> }) {
   try {
     const { Id } = await params
-    
-    const response = await fetch(`${BACKEND_URL}/api/companies/${Id}`, {
+
+    const response = await fetch(`${BACKEND_URL}/crm/companies/${Id}`, {
       method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-      },
+      headers: backendHeaders(request),
     })
 
     if (!response.ok) {
@@ -27,17 +24,15 @@ export async function GET(request: Request, { params }: { params: Promise<{ Id: 
   }
 }
 
-// PATCH - Update a company in Salesforce
+// PATCH - Update a company
 export async function PATCH(request: Request, { params }: { params: Promise<{ Id: string }> }) {
   try {
     const { Id } = await params
     const body = await request.json()
-    
-    const response = await fetch(`${BACKEND_URL}/api/companies/${Id}`, {
+
+    const response = await fetch(`${BACKEND_URL}/crm/companies/${Id}`, {
       method: "PATCH",
-      headers: {
-        "Content-Type": "application/json",
-      },
+      headers: backendHeaders(request),
       body: JSON.stringify(body),
     })
 
@@ -54,16 +49,16 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ Id
   }
 }
 
-// DELETE a company from Salesforce
+// DELETE a company
+// NOTE: the backend exposes no DELETE /crm/companies/{id}; this proxies through
+// and will surface the backend's 405 until that route exists.
 export async function DELETE(request: Request, { params }: { params: Promise<{ Id: string }> }) {
   try {
     const { Id } = await params
-    
-    const response = await fetch(`${BACKEND_URL}/api/companies/${Id}`, {
+
+    const response = await fetch(`${BACKEND_URL}/crm/companies/${Id}`, {
       method: "DELETE",
-      headers: {
-        "Content-Type": "application/json",
-      },
+      headers: backendHeaders(request),
     })
 
     if (!response.ok) {

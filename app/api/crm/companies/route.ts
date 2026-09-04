@@ -1,15 +1,12 @@
 import { NextResponse } from "next/server"
+import { BACKEND_URL, backendHeaders } from "@/lib/backend"
 
-const BACKEND_URL = process.env.BACKEND_URL || "http://localhost:8000"
-
-// GET all companies from Salesforce
-export async function GET() {
+// GET all companies
+export async function GET(request: Request) {
   try {
-    const response = await fetch(`${BACKEND_URL}/api/companies`, {
+    const response = await fetch(`${BACKEND_URL}/crm/companies`, {
       method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-      },
+      headers: backendHeaders(request),
     })
 
     if (!response.ok) {
@@ -25,16 +22,14 @@ export async function GET() {
   }
 }
 
-// POST - Create a new company in Salesforce
+// POST - Create a new company
 export async function POST(request: Request) {
   try {
     const body = await request.json()
-    
-    const response = await fetch(`${BACKEND_URL}/api/companies`, {
+
+    const response = await fetch(`${BACKEND_URL}/crm/companies`, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
+      headers: backendHeaders(request),
       body: JSON.stringify(body),
     })
 
